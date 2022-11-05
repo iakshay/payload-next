@@ -2,6 +2,21 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
+  rewrites: async () => {
+    return [
+      {
+        source: "/admin(.*)",
+        destination: "/admin/index.html",
+      }
+    ]
+}
 }
 
 module.exports = nextConfig
