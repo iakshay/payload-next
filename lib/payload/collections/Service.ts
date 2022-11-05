@@ -22,5 +22,10 @@ export const Service: CollectionConfig = {
       type: "text",
       required: true,
     },
+    {
+      name: "textfield",
+      type: "textarea",
+      required: true,
+    },
   ],
 };

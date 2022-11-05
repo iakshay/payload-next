@@ -1,10 +1,5 @@
-import { getPayload, expressApp } from "../../lib/payload";
-import httpStatus from 'http-status';
-import APIError from "payload/dist/errors/APIError";
-import {router } from "../../lib/middlewares"
+import { payload } from "../../lib/payload";
 import { NextApiRequest, NextApiResponse } from "next";
-
-const payload = getPayload()
 
 export const config = {
   api: {
@@ -13,5 +8,5 @@ export const config = {
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  expressApp.handle(req, res)
+  payload.express(req, res)
 }

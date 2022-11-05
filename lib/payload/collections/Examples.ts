@@ -18,6 +18,11 @@ const Examples: CollectionConfig = {
       name: 'someField',
       type: 'text',
     },
+    {
+      name: "textfield",
+      type: "textarea",
+      required: false,
+    },
   ],
 }
 
