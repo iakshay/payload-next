@@ -15,6 +15,42 @@ index 9383d60..2be62aa 100644
              config: formattedCollection,
          };
          // If not local, open routes
+diff --git a/node_modules/payload/dist/globals/buildModel.js b/node_modules/payload/dist/globals/buildModel.js
+index acc992a..8432c92 100644
+--- a/node_modules/payload/dist/globals/buildModel.js
++++ b/node_modules/payload/dist/globals/buildModel.js
+@@ -10,11 +10,13 @@ const buildModel = (config) => {
+     if (config.globals && config.globals.length > 0) {
+         const globalsSchema = new mongoose_1.default.Schema({}, { discriminatorKey: 'globalType', timestamps: true });
+         globalsSchema.plugin(buildQuery_1.default);
+-        const Globals = mongoose_1.default.model('globals', globalsSchema);
+-        Object.values(config.globals).forEach((globalConfig) => {
+-            const globalSchema = (0, buildSchema_1.default)(config, globalConfig.fields, { global: true });
+-            Globals.discriminator(globalConfig.slug, globalSchema);
+-        });
++        const Globals = mongoose_1.default.models['globals'] || mongoose_1.default.model('globals', globalsSchema);
++        if (!mongoose_1.default.models['globals']) {
++            Object.values(config.globals).forEach((globalConfig) => {
++                const globalSchema = (0, buildSchema_1.default)(config, globalConfig.fields, { global: true });
++                Globals.discriminator(globalConfig.slug, globalSchema);
++            });
++        }
+         return Globals;
+     }
+     return null;
+diff --git a/node_modules/payload/dist/globals/init.js b/node_modules/payload/dist/globals/init.js
+index b24b440..0ed3962 100644
+--- a/node_modules/payload/dist/globals/init.js
++++ b/node_modules/payload/dist/globals/init.js
+@@ -30,7 +30,7 @@ function initGlobals(ctx) {
+                 });
+                 versionSchema.plugin(mongoose_paginate_v2_1.default, { useEstimatedCount: true })
+                     .plugin(buildQuery_1.default);
+-                ctx.versions[global.slug] = mongoose_1.default.model(versionModelName, versionSchema);
++                ctx.versions[global.slug] =  mongoose_1.default.models['versionModelName'] || mongoose_1.default.model(versionModelName, versionSchema);
+             }
+         });
+         // If not local, open routes
 diff --git a/node_modules/payload/dist/init.js b/node_modules/payload/dist/init.js
 index f47f493..bba63f3 100644
 --- a/node_modules/payload/dist/init.js
@@ -32,3 +68,29 @@ index f47f493..bba63f3 100644
      // If not initializing locally, scaffold router
      if (!payload.local) {
          payload.router = express_1.default.Router();
+diff --git a/node_modules/payload/dist/mongoose/buildQuery.js b/node_modules/payload/dist/mongoose/buildQuery.js
+index 55b3e77..409f289 100644
+--- a/node_modules/payload/dist/mongoose/buildQuery.js
++++ b/node_modules/payload/dist/mongoose/buildQuery.js
+@@ -144,7 +144,7 @@ class ParamParser {
+             if (priorSchemaType) {
+                 const priorSchemaTypeOptions = (0, getSchemaTypeOptions_1.getSchemaTypeOptions)(priorSchemaType);
+                 if (typeof priorSchemaTypeOptions.ref === 'string') {
+-                    const RefModel = mongoose_1.default.model(priorSchemaTypeOptions.ref);
++                    const RefModel = mongoose_1.default.models[priorSchemaTypeOptions.ref] || mongoose_1.default.model(priorSchemaTypeOptions.ref);
+                     lastIncompletePath.complete = true;
+                     const remainingPath = pathSegments.slice(i).join('.');
+                     paths = [
+diff --git a/node_modules/payload/dist/preferences/model.js b/node_modules/payload/dist/preferences/model.js
+index 7232456..0dbe0c1 100644
+--- a/node_modules/payload/dist/preferences/model.js
++++ b/node_modules/payload/dist/preferences/model.js
+@@ -24,7 +24,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+ const mongoose_1 = __importStar(require("mongoose"));
+-const Model = mongoose_1.default.model('_preferences', new mongoose_1.Schema({
++const Model = mongoose_1.default.models['_preferences'] || mongoose_1.default.model('_preferences', new mongoose_1.Schema({
+     user: {
+         type: mongoose_1.Schema.Types.ObjectId,
+         refPath: 'userCollection',

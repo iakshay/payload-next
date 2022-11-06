@@ -5,6 +5,7 @@ import payloadConfig from "./payload.config";
 import validate from "payload/dist/config/validate";
 import Logger from "payload/dist/utilities/logger";
 
+// https://www.prisma.io/docs/guides/database/troubleshooting-orm/help-articles/nextjs-prisma-client-dev-practices
 declare global {
   // allow global `var` declarations
   // eslint-disable-next-line no-var
@@ -15,7 +16,11 @@ export const payload = global.payload || initPayload();
 function initPayload() {
   console.log("Initializing payload.");
   // Build config
-  const configPath = path.resolve(__dirname, "./payload.config.ts");
+
+  // Path to config to be used in webpack in development environment
+  // @ts-ignore
+  const configPath = path.resolve(process.env.INIT_CWD, `./lib/payload/payload.config.ts`);
+  // @ts-ignore
   const validatedConfig = validate(payloadConfig, Logger());
   const finalConfig = {
     ...validatedConfig,
@@ -31,7 +36,9 @@ function initPayload() {
 
   // Initialize Payload
   globalPayload.init({
+    // @ts-ignore
     secret: process.env.PAYLOAD_SECRET,
+    // @ts-ignore
     mongoURL: process.env.MONGODB_URI,
     express: expressApp,
     validatedConfig: finalConfig,
