@@ -1,4 +1,4 @@
-import globalPayload, {Payload} from "payload";
+import globalPayload, { Payload } from "payload";
 import express from "express";
 import path from "path";
 import payloadConfig from "./payload.config";
@@ -19,7 +19,11 @@ function initPayload() {
 
   // Path to config to be used in webpack in development environment
   // @ts-ignore
-  const configPath = path.resolve(process.env.INIT_CWD, `./lib/payload/payload.config.ts`);
+  const configPath =
+    process.env.NODE_ENV !== "production"
+      // @ts-ignore
+      ? path.resolve(process.env.INIT_CWD, `lib/payload/payload.config.ts`)
+      : path.resolve(__dirname, "./payload.config.ts");
   // @ts-ignore
   const validatedConfig = validate(payloadConfig, Logger());
   const finalConfig = {
@@ -43,11 +47,13 @@ function initPayload() {
     express: expressApp,
     validatedConfig: finalConfig,
     onInit: () => {
-      globalPayload.logger.info(`Payload Admin URL: ${globalPayload.getAdminURL()}`);
+      globalPayload.logger.info(
+        `Payload Admin URL: ${globalPayload.getAdminURL()}`
+      );
     },
   });
 
   return globalPayload;
 }
 
-if (process.env.NODE_ENV !== 'production') global.payload = payload
+if (process.env.NODE_ENV !== "production") global.payload = payload;
